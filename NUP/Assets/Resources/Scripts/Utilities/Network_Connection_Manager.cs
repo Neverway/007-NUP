@@ -31,7 +31,6 @@ public class Network_Connection_Manager : MonoBehaviour
     // Private Variables
     //=-----------------=
     private bool attemptingConnection;
-    private bool connectedToServer;
     
     
     //=-----------------=
@@ -39,8 +38,12 @@ public class Network_Connection_Manager : MonoBehaviour
     //=-----------------=
     private UnityTransport transport;
     private NetworkManager networkManager;
+    [Header("Title References")]
     [SerializeField] private TMP_InputField addressField;
     [SerializeField] private TMP_InputField portField;
+    [SerializeField] private GameObject connectionMessageMenu;
+    [SerializeField] private GameObject[] connectionMessageButtons;
+    [SerializeField] private TMP_Text connectionMessage;
 
 
     //=-----------------=
@@ -51,13 +54,18 @@ public class Network_Connection_Manager : MonoBehaviour
 	    // Start a five second countdown
 	    yield return new WaitForSeconds(5);
 	    // If connection to server has been established, exit function
-	    if (connectedToServer) yield break;
+	    if (!attemptingConnection) yield break;
 	    // Stop attempting to connect
 	    attemptingConnection = false;
-	    // Shutdown connection attempt
-	    networkManager.Shutdown();
+	    // Shutdown the connection attempt
+	    NetworkDisconnect();
+	    // Hide the other button
+	    connectionMessageButtons[0].SetActive(false);
+	    // Show the close and reconnect buttons
+	    connectionMessageButtons[1].SetActive(true);
+	    connectionMessageButtons[2].SetActive(true);
 	    // Show fail to connect message
-	    print("Could not Connect to Server!");
+	    connectionMessage.text = "Failed to connect!";
     }
     
     private void Update()
@@ -69,14 +77,21 @@ public class Network_Connection_Manager : MonoBehaviour
 
 	    if (attemptingConnection)
 	    {
+			// Show connecting message
+		    connectionMessage.text = "Establishing connection...";
+		    
 		    if (networkManager.IsConnectedClient)
 		    {
-			    // Set this to true so the connectionTimeout function will stop
-			    connectedToServer = true;
+			    // Set this to false so the connectionTimeout function will stop
 			    // Stop attempting to connect
 			    attemptingConnection = false;
+			    // Show the cancel connection button
+			    connectionMessageButtons[0].SetActive(true);
+			    // Hide the other buttons
+			    connectionMessageButtons[1].SetActive(false);
+			    connectionMessageButtons[2].SetActive(false);
 			    // Show connection established message
-			    print("Connected to server!");
+			    connectionMessage.text = "Connected to server!";
 		    } 
 	    }
     }
@@ -130,8 +145,16 @@ public class Network_Connection_Manager : MonoBehaviour
     public void NetworkConnectClient()
     {
 	    networkManager.StartClient();
-	    print("ConnectRequest");
+	    // Show connection message screen
+	    connectionMessageMenu.SetActive(true);
+	    // Show the cancel connection button
+	    connectionMessageButtons[0].SetActive(true);
+	    // Hide the other buttons
+	    connectionMessageButtons[1].SetActive(false);
+	    connectionMessageButtons[2].SetActive(false);
+	    // Start connection timeout timer
 	    StartCoroutine(ConnectionTimeout());
+		// Check for successful connection in update
 	    attemptingConnection = true;
     }
     
@@ -141,6 +164,8 @@ public class Network_Connection_Manager : MonoBehaviour
     [Tooltip("Shutdown the server")]
     public void NetworkDisconnect()
     {
+	    // Stop the connection check
+	    attemptingConnection = false;
 	    // Disconnect the server
 	    networkManager.Shutdown();
     }
