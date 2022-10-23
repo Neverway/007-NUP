@@ -1,0 +1,5 @@
+# Ignore project builds folder
+/[Bb]uild/
+/[Bb]uilds/
+# Ignore old project files
+/[Oo]ld/
