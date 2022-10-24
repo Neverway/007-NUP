@@ -44,6 +44,7 @@ public class Network_Connection_Manager : MonoBehaviour
     [SerializeField] private GameObject connectionMessageMenu;
     [SerializeField] private GameObject[] connectionMessageButtons;
     [SerializeField] private TMP_Text connectionMessage;
+    [SerializeField] private TMP_Text dedicatedServerMessage;
 
 
     //=-----------------=
@@ -135,6 +136,8 @@ public class Network_Connection_Manager : MonoBehaviour
     public void NetworkConnectServer()
     {
 	    networkManager.StartServer();
+	    // Show hosting address on dedicated server screen
+	    dedicatedServerMessage.text = "Hosting on: "+targetAddress+":"+targetPort;
     }
     [Tooltip("Connect to target address and port as host")]
     public void NetworkConnectHost()
