@@ -12,11 +12,15 @@
 //           typeOf ushort
 //=============================================================================
 
+using System;
 using System.Collections;
+using System.Net;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Network_Connection_Manager : MonoBehaviour
 {
@@ -39,12 +43,16 @@ public class Network_Connection_Manager : MonoBehaviour
     private UnityTransport transport;
     private NetworkManager networkManager;
     [Header("Title References")]
+    [Tooltip("The input field where the user types their hosting or connecting ip address")]
     [SerializeField] private TMP_InputField addressField;
+    [Tooltip("The input field where the user types their hosting or connecting ip port")]
     [SerializeField] private TMP_InputField portField;
-    [SerializeField] private GameObject connectionMessageMenu;
-    [SerializeField] private GameObject[] connectionMessageButtons;
-    [SerializeField] private TMP_Text connectionMessage;
-    [SerializeField] private TMP_Text dedicatedServerMessage;
+
+    [SerializeField] private UnityEvent OnConnecting;
+    [SerializeField] private UnityEvent OnConnectionFailed;
+    [SerializeField] private UnityEvent OnInvalidAddress;
+    [SerializeField] private UnityEvent OnConnected;
+    [SerializeField] private UnityEvent OnDedicatedServerConnected;
 
 
     //=-----------------=
@@ -60,13 +68,8 @@ public class Network_Connection_Manager : MonoBehaviour
 	    attemptingConnection = false;
 	    // Shutdown the connection attempt
 	    NetworkDisconnect();
-	    // Hide the other button
-	    connectionMessageButtons[0].SetActive(false);
-	    // Show the close and reconnect buttons
-	    connectionMessageButtons[1].SetActive(true);
-	    connectionMessageButtons[2].SetActive(true);
-	    // Show fail to connect message
-	    connectionMessage.text = "Failed to connect!";
+	    // Fire on connection failed
+	    OnConnectionFailed.Invoke();
     }
     
     private void Update()
@@ -74,25 +77,21 @@ public class Network_Connection_Manager : MonoBehaviour
 	    if (!transport) transport = FindObjectOfType<UnityTransport>();
 	    if (!networkManager) networkManager = FindObjectOfType<NetworkManager>();
 	    
-	    UpdateTargetAddress();
+	    //UpdateTargetAddress();
+	    if (addressField)
+	    {
+		    addressField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetAddress");
+	    }
 
 	    if (attemptingConnection)
 	    {
-			// Show connecting message
-		    connectionMessage.text = "Establishing connection...";
-		    
 		    if (networkManager.IsConnectedClient)
 		    {
 			    // Set this to false so the connectionTimeout function will stop
 			    // Stop attempting to connect
 			    attemptingConnection = false;
-			    // Show the cancel connection button
-			    connectionMessageButtons[0].SetActive(true);
-			    // Hide the other buttons
-			    connectionMessageButtons[1].SetActive(false);
-			    connectionMessageButtons[2].SetActive(false);
-			    // Show connection established message
-			    connectionMessage.text = "Connected to server!";
+			    // Fire on connected
+			    OnConnected.Invoke();
 		    } 
 	    }
     }
@@ -116,7 +115,8 @@ public class Network_Connection_Manager : MonoBehaviour
 	    targetPort = PlayerPrefs.GetString("NetTargetPort");
 	    
 	    // Assign NetTarget to transport
-	    transport.ConnectionData.Address = targetAddress;
+	    IPAddress.TryParse(PlayerPrefs.GetString("NetTargetAddress", "127.0.0.1"), out var address);
+	    transport.ConnectionData.Address = address.ToString();
 	    ushort.TryParse(PlayerPrefs.GetString("NetTargetPort", "25565"), out var port);
 	    transport.ConnectionData.Port = port;
 	    
@@ -136,29 +136,36 @@ public class Network_Connection_Manager : MonoBehaviour
     public void NetworkConnectServer()
     {
 	    networkManager.StartServer();
-	    // Show hosting address on dedicated server screen
-	    dedicatedServerMessage.text = "Hosting on: "+targetAddress+":"+targetPort;
+	    // Fire on dedicated server started
+	    OnDedicatedServerConnected.Invoke();
     }
     [Tooltip("Connect to target address and port as host")]
     public void NetworkConnectHost()
     {
-		networkManager.StartHost();
+	    // Start host if the address and port is valid
+	    // Ports share the same limits as a ushort, so parsing the target port as ushort will return only valid ports
+	    if (IPAddress.TryParse(targetAddress, out var test) && ushort.TryParse(targetPort, out var tests))
+		    networkManager.StartHost();
+	    // Show error message if address is not valid
+	    else OnInvalidAddress.Invoke();
     }
     [Tooltip("Connect to target address and port as client")]
     public void NetworkConnectClient()
     {
-	    networkManager.StartClient();
-	    // Show connection message screen
-	    connectionMessageMenu.SetActive(true);
-	    // Show the cancel connection button
-	    connectionMessageButtons[0].SetActive(true);
-	    // Hide the other buttons
-	    connectionMessageButtons[1].SetActive(false);
-	    connectionMessageButtons[2].SetActive(false);
-	    // Start connection timeout timer
-	    StartCoroutine(ConnectionTimeout());
-		// Check for successful connection in update
-	    attemptingConnection = true;
+	    // Start host if the address and port is valid
+	    // Ports share the same limits as a ushort, so parsing the target port as ushort will return only valid ports
+	    if (IPAddress.TryParse(targetAddress, out var test) && ushort.TryParse(targetPort, out var tests))
+	    {
+		    networkManager.StartClient();
+		    // Fire on connecting
+		    OnConnecting.Invoke();
+		    // Start connection timeout timer
+		    StartCoroutine(ConnectionTimeout());
+		    // Check for successful connection in update
+		    attemptingConnection = true;
+	    }
+	    // Show error message if address is not valid
+	    else OnInvalidAddress.Invoke();
     }
     
     //=-----------------=
@@ -179,12 +186,32 @@ public class Network_Connection_Manager : MonoBehaviour
     [Tooltip("Set the target network address from TextMeshPro inputField")]
     public void NetworkSetAddress()
     {
+	    // Check the value set in the input field
+	    IPAddress.TryParse(addressField.text, out var parsedAddress);
+	    // If the value is invalid, set it to a default value
+	    if (parsedAddress == null)
+	    {
+		    targetAddress = "127.0.0.1";
+		    // Assign the value to the player prefs
+		    PlayerPrefs.SetString("NetTargetAddress", "127.0.0.1");
+	    }
+	    // Assign the value to the network transport
+	    else
+	    {
+		    transport.ConnectionData.Address = parsedAddress.ToString();
+		    // Assign the value to the player prefs
+		    PlayerPrefs.SetString("NetTargetAddress", parsedAddress.ToString());
+	    }
+	    // Clear field
+	    addressField.text = "";
+	    /*
 	    // Fallback to localhost address if address is not specified
 	    if (addressField.text == "") PlayerPrefs.SetString("NetTargetAddress", "127.0.0.1");
 	    // Set network address to input field text
 	    else PlayerPrefs.SetString("NetTargetAddress", addressField.text);
 	    // Clear field
 	    addressField.text = "";
+	    */
     }
     [Tooltip("Set the target network port from TextMeshPro inputField")]
     public void NetworkSetPort()
