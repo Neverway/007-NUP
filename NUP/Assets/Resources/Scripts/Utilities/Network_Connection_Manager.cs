@@ -82,6 +82,10 @@ public class Network_Connection_Manager : MonoBehaviour
 	    {
 		    addressField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetAddress");
 	    }
+	    if (portField)
+	    {
+		    portField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetPort");
+	    }
 
 	    if (attemptingConnection)
 	    {
@@ -204,7 +208,8 @@ public class Network_Connection_Manager : MonoBehaviour
 	    }
 	    // Clear field
 	    addressField.text = "";
-	    /*
+	    
+	    /* Old function
 	    // Fallback to localhost address if address is not specified
 	    if (addressField.text == "") PlayerPrefs.SetString("NetTargetAddress", "127.0.0.1");
 	    // Set network address to input field text
@@ -216,32 +221,53 @@ public class Network_Connection_Manager : MonoBehaviour
     [Tooltip("Set the target network port from TextMeshPro inputField")]
     public void NetworkSetPort()
     {
-	    // Fallback to localhost port if port is not specified
-	    if (portField.text == "") PlayerPrefs.SetString("NetTargetPort", "25565");
-	    // Set network address to input field text
-	    else PlayerPrefs.SetString("NetTargetPort", portField.text);
+	    // Check the value set in the input field
+	    ushort.TryParse(portField.text, out var parsedPort);
+	    // If the value is invalid, set it to a default value
+	    if (parsedPort == 0)
+	    {
+		    targetPort = "25565";
+		    // Assign the value to the player prefs
+		    PlayerPrefs.SetString("NetTargetPort", "25565");
+	    }
+	    // Assign the value to the network transport
+	    else
+	    {
+		    transport.ConnectionData.Port = parsedPort;
+		    // Assign the value to the player prefs
+		    PlayerPrefs.SetString("NetTargetPort", parsedPort.ToString());
+	    }
 	    // Clear field
 	    portField.text = "";
-    }
-    
-    //=-----------------=
-    // SHORT CUTS
-    //=-----------------=
-    [Tooltip("Find the local client object")]
-    public Network_Client NetworkLocalClient()
-    {
-	    // Set default return to null
-	    Network_Client localClient = null;
 	    
-	    // Look through all Network_Client objects in the scene
-	    foreach (var client in FindObjectsOfType<Network_Client>())
-	    {
-		    // Set localClient to client if local client is owner
-		    if (client.IsOwner) localClient = client;
-	    }
-	    
-	    // Return result
-	    return localClient;
-    }
+		/* Old function
+		// Fallback to localhost port if port is not specified
+		if (portField.text == "") PlayerPrefs.SetString("NetTargetPort", "25565");
+		// Set network address to input field text
+		else PlayerPrefs.SetString("NetTargetPort", portField.text);
+		// Clear field
+		portField.text = "";
+	    */
+	}
+
+//=-----------------=
+// SHORT CUTS
+//=-----------------=
+[Tooltip("Find the local client object")]
+public Network_Client NetworkLocalClient()
+{
+// Set default return to null
+Network_Client localClient = null;
+
+// Look through all Network_Client objects in the scene
+foreach (var client in FindObjectsOfType<Network_Client>())
+{
+	// Set localClient to client if local client is owner
+	if (client.IsOwner) localClient = client;
+}
+
+// Return result
+return localClient;
+}
 }
 
