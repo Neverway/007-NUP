@@ -104,7 +104,7 @@ public class Network_Connection_Messages : MonoBehaviour
 	    // Show the dedicated server menu
 	    dedicatedServerMenu.SetActive(true);
 	    // Show the dedicated server target address
-	    dedicatedServerAddressText.text = connectionManager.targetAddress + ":" + connectionManager.targetPort;
+	    dedicatedServerAddressText.text = PlayerPrefs.GetString("NetTargetAddress") + ":" + PlayerPrefs.GetString("NetTargetPort");
     }
 }
 
