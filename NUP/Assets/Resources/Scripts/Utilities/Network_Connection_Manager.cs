@@ -27,8 +27,8 @@ public class Network_Connection_Manager : MonoBehaviour
     //=-----------------=
     // Public Variables
     //=-----------------=
-    public string targetAddress;
-    public string targetPort;
+    //public string targetAddress;
+    //public string targetPort;
 
 
     //=-----------------=
@@ -73,6 +73,10 @@ public class Network_Connection_Manager : MonoBehaviour
 	    OnConnectionFailed.Invoke();
     }
     
+    private void Start()
+    {
+    }
+    
     private void Update()
     {
 	    if (!transport) transport = FindObjectOfType<UnityTransport>();
@@ -97,15 +101,26 @@ public class Network_Connection_Manager : MonoBehaviour
     //=-----------------=
     private void UpdateTargetAddress()
     {
+	    // If the player prefs for target address and port are not created, create them with the following default values
+	    if (!PlayerPrefs.HasKey("NetTargetAddress")) PlayerPrefs.SetString("NetTargetAddress", "127.0.0.1");
+	    if (!PlayerPrefs.HasKey("NetTargetPort")) PlayerPrefs.SetString("NetTargetPort", "25565");
+	    
 	    // Exit function if we can't change the address
 	    // (null address/port field is quick way for me to check that it can't be changed)
 	    if (!addressField) return;
 	    // Updated placeholder text for address field
 	    addressField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetAddress");
+	    // Assign value to transport
+	    transport.ConnectionData.Address = PlayerPrefs.GetString("NetTargetAddress");
 	    
 	    if (!portField) return;
 	    // Updated placeholder text for port field
 	    portField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetPort");
+	    // Parse value for transport (transport.connectionData.Port expects a ushort instead of the raw string)
+	    // It's kind of redundant to parse it again here since the player pref value should be valid, but whatever
+	    ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var parsedPort);
+	    // Assign value to transport
+	    transport.ConnectionData.Port = parsedPort;
     }
     
     
@@ -127,17 +142,21 @@ public class Network_Connection_Manager : MonoBehaviour
     {
 	    // Start host if the address and port is valid
 	    // Ports share the same limits as a ushort, so parsing the target port as ushort will return only valid ports
-	    if (IPAddress.TryParse(targetAddress, out var test) && ushort.TryParse(targetPort, out var tests))
+	    if (IPAddress.TryParse(PlayerPrefs.GetString("NetTargetAddress"), out var address) && ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var port))
 		    networkManager.StartHost();
 	    // Show error message if address is not valid
-	    else OnInvalidAddress.Invoke();
+	    else
+	    {
+		    OnInvalidAddress.Invoke();
+	    }
     }
     [Tooltip("Connect to target address and port as client")]
     public void NetworkConnectClient()
     {
+	    
 	    // Start host if the address and port is valid
 	    // Ports share the same limits as a ushort, so parsing the target port as ushort will return only valid ports
-	    if (IPAddress.TryParse(targetAddress, out var test) && ushort.TryParse(targetPort, out var tests))
+	    if (IPAddress.TryParse(PlayerPrefs.GetString("NetTargetAddress"), out var address) && ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var port))
 	    {
 		    networkManager.StartClient();
 		    // Fire on connecting
@@ -172,19 +191,9 @@ public class Network_Connection_Manager : MonoBehaviour
 	    // Check the value set in the input field
 	    IPAddress.TryParse(addressField.text, out var parsedAddress);
 	    // If the value is invalid, set it to a default value
-	    if (parsedAddress == null)
-	    {
-		    targetAddress = "127.0.0.1";
-		    // Assign the value to the player prefs
-		    PlayerPrefs.SetString("NetTargetAddress", "127.0.0.1");
-	    }
+	    if (parsedAddress == null) PlayerPrefs.SetString("NetTargetAddress", "127.0.0.1");
 	    // Assign the value to the network transport
-	    else
-	    {
-		    transport.ConnectionData.Address = parsedAddress.ToString();
-		    // Assign the value to the player prefs
-		    PlayerPrefs.SetString("NetTargetAddress", parsedAddress.ToString());
-	    }
+	    else PlayerPrefs.SetString("NetTargetAddress", parsedAddress.ToString());
 	    // Clear field
 	    addressField.text = "";
     }
@@ -194,19 +203,9 @@ public class Network_Connection_Manager : MonoBehaviour
 	    // Check the value set in the input field
 	    ushort.TryParse(portField.text, out var parsedPort);
 	    // If the value is invalid, set it to a default value
-	    if (parsedPort == 0)
-	    {
-		    targetPort = "25565";
-		    // Assign the value to the player prefs
-		    PlayerPrefs.SetString("NetTargetPort", "25565");
-	    }
+	    if (parsedPort == 0) PlayerPrefs.SetString("NetTargetPort", "25565");
 	    // Assign the value to the network transport
-	    else
-	    {
-		    transport.ConnectionData.Port = parsedPort;
-		    // Assign the value to the player prefs
-		    PlayerPrefs.SetString("NetTargetPort", parsedPort.ToString());
-	    }
+	    else PlayerPrefs.SetString("NetTargetPort", parsedPort.ToString());
 	    // Clear field
 	    portField.text = "";
 	}
