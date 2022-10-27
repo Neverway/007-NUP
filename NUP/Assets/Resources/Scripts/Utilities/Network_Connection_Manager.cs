@@ -58,6 +58,7 @@ public class Network_Connection_Manager : MonoBehaviour
     //=-----------------=
     // Mono Functions
     //=-----------------=
+    // Client connection timed out
     private IEnumerator ConnectionTimeout()
     {
 	    // Start a five second countdown
@@ -77,26 +78,16 @@ public class Network_Connection_Manager : MonoBehaviour
 	    if (!transport) transport = FindObjectOfType<UnityTransport>();
 	    if (!networkManager) networkManager = FindObjectOfType<NetworkManager>();
 	    
-	    //UpdateTargetAddress();
-	    if (addressField)
-	    {
-		    addressField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetAddress");
-	    }
-	    if (portField)
-	    {
-		    portField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetPort");
-	    }
+	    UpdateTargetAddress();
 
-	    if (attemptingConnection)
+	    // Client connection check
+	    if (attemptingConnection && networkManager.IsConnectedClient)
 	    {
-		    if (networkManager.IsConnectedClient)
-		    {
-			    // Set this to false so the connectionTimeout function will stop
-			    // Stop attempting to connect
-			    attemptingConnection = false;
-			    // Fire on connected
-			    OnConnected.Invoke();
-		    } 
+		    // Set this to false so the connectionTimeout function will stop
+		    // Stop attempting to connect
+		    attemptingConnection = false;
+		    // Fire on connected
+		    OnConnected.Invoke();
 	    }
     }
     
@@ -107,26 +98,14 @@ public class Network_Connection_Manager : MonoBehaviour
     private void UpdateTargetAddress()
     {
 	    // Exit function if we can't change the address
-	    // (null address field is quick way for me to check that it can't be changed)
+	    // (null address/port field is quick way for me to check that it can't be changed)
 	    if (!addressField) return;
+	    // Updated placeholder text for address field
+	    addressField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetAddress");
 	    
-	    // Create starting NetTarget prefs
-	    if (!PlayerPrefs.HasKey("NetTargetAddress")) PlayerPrefs.SetString("NetTargetAddress", "127.0.0.1");
-	    if (!PlayerPrefs.HasKey("NetTargetPort")) PlayerPrefs.SetString("NetTargetPort", "25565");
-
-	    // Set local vars to NetTarget prefs (makes code look neater)
-	    targetAddress = PlayerPrefs.GetString("NetTargetAddress");
-	    targetPort = PlayerPrefs.GetString("NetTargetPort");
-	    
-	    // Assign NetTarget to transport
-	    IPAddress.TryParse(PlayerPrefs.GetString("NetTargetAddress", "127.0.0.1"), out var address);
-	    transport.ConnectionData.Address = address.ToString();
-	    ushort.TryParse(PlayerPrefs.GetString("NetTargetPort", "25565"), out var port);
-	    transport.ConnectionData.Port = port;
-	    
-	    // Set input fields to show current address
-	    addressField.transform.GetChild(0).GetComponent<TMP_Text>().text = targetAddress;
-	    portField.transform.GetChild(0).GetComponent<TMP_Text>().text = targetPort;
+	    if (!portField) return;
+	    // Updated placeholder text for port field
+	    portField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetPort");
     }
     
     
@@ -208,15 +187,6 @@ public class Network_Connection_Manager : MonoBehaviour
 	    }
 	    // Clear field
 	    addressField.text = "";
-	    
-	    /* Old function
-	    // Fallback to localhost address if address is not specified
-	    if (addressField.text == "") PlayerPrefs.SetString("NetTargetAddress", "127.0.0.1");
-	    // Set network address to input field text
-	    else PlayerPrefs.SetString("NetTargetAddress", addressField.text);
-	    // Clear field
-	    addressField.text = "";
-	    */
     }
     [Tooltip("Set the target network port from TextMeshPro inputField")]
     public void NetworkSetPort()
@@ -239,35 +209,27 @@ public class Network_Connection_Manager : MonoBehaviour
 	    }
 	    // Clear field
 	    portField.text = "";
-	    
-		/* Old function
-		// Fallback to localhost port if port is not specified
-		if (portField.text == "") PlayerPrefs.SetString("NetTargetPort", "25565");
-		// Set network address to input field text
-		else PlayerPrefs.SetString("NetTargetPort", portField.text);
-		// Clear field
-		portField.text = "";
-	    */
 	}
 
-//=-----------------=
-// SHORT CUTS
-//=-----------------=
-[Tooltip("Find the local client object")]
-public Network_Client NetworkLocalClient()
-{
-// Set default return to null
-Network_Client localClient = null;
+	//=-----------------=
+	// SHORT CUTS
+	//=-----------------=
+	/* I don't think this function is in use anymore, commenting it out for now
+	[Tooltip("Find the local client object")]
+	public Network_Client NetworkLocalClient()
+	{
+		// Set default return to null
+		Network_Client localClient = null;
 
-// Look through all Network_Client objects in the scene
-foreach (var client in FindObjectsOfType<Network_Client>())
-{
-	// Set localClient to client if local client is owner
-	if (client.IsOwner) localClient = client;
-}
+		// Look through all Network_Client objects in the scene
+		foreach (var client in FindObjectsOfType<Network_Client>())
+		{
+			// Set localClient to client if local client is owner
+			if (client.IsOwner) localClient = client;
+		}
 
-// Return result
-return localClient;
-}
+		// Return result
+		return localClient;
+	}*/
 }
 
