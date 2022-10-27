@@ -62,12 +62,12 @@ public class Network_Connection_Messages : MonoBehaviour
 	    connectionMessageMenu.SetActive(true);
 	    // Show the connecting to server message
 	    connectionMessageText.text = connectingMessage;
-	    // Show the connecting to server buttons
-	    foreach (var button in connectingButtons) button.SetActive(true);
 	    // Hide the connection to server failed buttons
 	    foreach (var button in connectionFailedButtons) button.SetActive(false);
 	    // Hide the invalid address buttons
 	    foreach (var button in invalidAddressButtons) button.SetActive(false);
+	    // Show the connecting to server buttons
+	    foreach (var button in connectingButtons) button.SetActive(true);
     }
     public void Connected()
     {
@@ -81,10 +81,10 @@ public class Network_Connection_Messages : MonoBehaviour
 	    connectionMessageText.text = connectionFailedMessage;
 	    // Hide the connecting to server buttons
 	    foreach (var button in connectingButtons) button.SetActive(false);
-	    // Show the connection to server failed buttons
-	    foreach (var button in connectionFailedButtons) button.SetActive(true);
 	    // Hide the invalid address buttons
 	    foreach (var button in invalidAddressButtons) button.SetActive(false);
+	    // Show the connection to server failed buttons
+	    foreach (var button in connectionFailedButtons) button.SetActive(true);
     }
     public void InvalidAddress()
     {
