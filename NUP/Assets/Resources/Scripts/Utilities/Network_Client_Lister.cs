@@ -7,10 +7,8 @@
 //
 //=============================================================================
 
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.Netcode;
 using UnityEngine;
 
 public class Network_Client_Lister : MonoBehaviour
@@ -38,7 +36,7 @@ public class Network_Client_Lister : MonoBehaviour
     // Mono Functions
     //=-----------------=
 
-    private void FixedUpdate()
+    private void Update()
     {
         networkClients.Clear();
         foreach (var entry in entries)

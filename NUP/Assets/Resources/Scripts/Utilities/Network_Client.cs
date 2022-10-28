@@ -74,7 +74,7 @@ public class Network_Client : NetworkBehaviour
     private void UpdateLocalScene()
     {
 	    // Assign net value
-	    if (IsOwner) _currentScene.Value = SceneManager.GetActiveScene().ToString();
+	    if (IsOwner) _currentScene.Value = SceneManager.GetActiveScene().name;
 	    // Parse net value for easier reference in scripts
 	    currentScene = _currentScene.Value.ToString();
     }
