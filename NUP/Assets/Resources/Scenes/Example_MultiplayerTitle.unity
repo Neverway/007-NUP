@@ -4175,6 +4175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 947bd959a32485bfd9b102d2b812a972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  titleScene: Example_MultiplayerTitle
   addressField: {fileID: 240383955}
   portField: {fileID: 775963575}
   OnConnecting:

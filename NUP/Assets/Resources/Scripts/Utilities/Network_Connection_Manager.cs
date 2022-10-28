@@ -21,6 +21,7 @@ using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Network_Connection_Manager : MonoBehaviour
 {
@@ -42,6 +43,10 @@ public class Network_Connection_Manager : MonoBehaviour
     //=-----------------=
     private UnityTransport transport;
     private NetworkManager networkManager;
+    private System_SceneManager sceneManager;
+
+    [SerializeField] private string titleScene = "0";
+    
     [Header("Title References")]
     [Tooltip("The input field where the user types their hosting or connecting ip address")]
     [SerializeField] private TMP_InputField addressField;
@@ -77,6 +82,7 @@ public class Network_Connection_Manager : MonoBehaviour
     {
 	    if (!transport) transport = FindObjectOfType<UnityTransport>();
 	    if (!networkManager) networkManager = FindObjectOfType<NetworkManager>();
+	    if (!sceneManager) sceneManager = FindObjectOfType<System_SceneManager>();
 	    
 	    UpdateTargetAddress();
 
@@ -170,10 +176,13 @@ public class Network_Connection_Manager : MonoBehaviour
     [Tooltip("Shutdown the server")]
     public void NetworkDisconnect()
     {
-	    // Stop the connection check
+	    // Stop the connection check (in case it was running)
 	    attemptingConnection = false;
 	    // Disconnect the server
 	    networkManager.Shutdown();
+	    // Load the title scene if it's not already loaded
+	    if (SceneManager.GetActiveScene() != SceneManager.GetSceneByName(titleScene))
+		    sceneManager.LoadScene(titleScene, 0);
     }
     
     //=-----------------=
