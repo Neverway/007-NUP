@@ -73,10 +73,6 @@ public class Network_Connection_Manager : MonoBehaviour
 	    OnConnectionFailed.Invoke();
     }
     
-    private void Start()
-    {
-    }
-    
     private void Update()
     {
 	    if (!transport) transport = FindObjectOfType<UnityTransport>();
@@ -90,7 +86,7 @@ public class Network_Connection_Manager : MonoBehaviour
 		    // Set this to false so the connectionTimeout function will stop
 		    // Stop attempting to connect
 		    attemptingConnection = false;
-		    // Fire on connected
+		    // Fire on connected for client (User sets if this sends them to a game, or shows a lobby, etc.)
 		    OnConnected.Invoke();
 	    }
     }
@@ -145,15 +141,13 @@ public class Network_Connection_Manager : MonoBehaviour
 	    if (IPAddress.TryParse(PlayerPrefs.GetString("NetTargetAddress"), out var address) && ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var port))
 		    networkManager.StartHost();
 	    // Show error message if address is not valid
-	    else
-	    {
-		    OnInvalidAddress.Invoke();
-	    }
+	    else OnInvalidAddress.Invoke();
+	    // Fire on connected for client (User sets if this sends them to a game, or shows a lobby, etc.)
+	    OnConnected.Invoke();
     }
     [Tooltip("Connect to target address and port as client")]
     public void NetworkConnectClient()
     {
-	    
 	    // Start host if the address and port is valid
 	    // Ports share the same limits as a ushort, so parsing the target port as ushort will return only valid ports
 	    if (IPAddress.TryParse(PlayerPrefs.GetString("NetTargetAddress"), out var address) && ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var port))
