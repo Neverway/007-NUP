@@ -57,18 +57,23 @@ public class Network_Connection_Connector : MonoBehaviour
 	    sceneManager.LoadScene(startingScene, 0.2f);
     }
     
-	/*
-    private void GetCurrentServerScene()
+    private string GetCurrentServerScene()
     {
-		    
+	    var value = "0";
+	    foreach (var client in FindObjectsOfType<Network_Client>())
+	    {
+		    if (client.gameObject.GetComponent<NetworkObject>().IsOwner)
+			    value = client.currentScene;
+	    }
+
+	    return value;
     }
     
     private void ClientConnectToScene(string startingScene)
     {
 	    sceneManager.LoadScene(startingScene, 0.2f);
     }
-    */
-    
+
     //=-----------------=
     // External Functions
     //=-----------------=
@@ -80,7 +85,7 @@ public class Network_Connection_Connector : MonoBehaviour
 	    }
 	    else if (networkManager.IsClient)
 	    {
-		    //ClientConnectToScene(GetCurrentServerScene());
+		    ClientConnectToScene(GetCurrentServerScene());
 	    }
     }
 }
