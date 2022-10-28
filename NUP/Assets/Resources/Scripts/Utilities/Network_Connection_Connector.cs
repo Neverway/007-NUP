@@ -43,15 +43,10 @@ public class Network_Connection_Connector : MonoBehaviour
 	    sceneManager = FindObjectOfType<System_SceneManager>();
 	    networkManager = FindObjectOfType<NetworkManager>();
     }
-
-    private void Update()
-    {
-	
-    }
     
     //=-----------------=
     // Internal Functions
-    //=-----------------=
+    //=-----------------=S
     private void HostConnectToScene(string startingScene)
     {
 	    sceneManager.LoadScene(startingScene, 0.2f);
@@ -60,33 +55,30 @@ public class Network_Connection_Connector : MonoBehaviour
     private string GetCurrentServerScene()
     {
 	    var value = "0";
+	    // Look through all players on the server
 	    foreach (var client in FindObjectsOfType<Network_Client>())
 	    {
-		    if (client.gameObject.GetComponent<NetworkObject>().IsOwner)
-			    value = client.currentScene;
+		    // If the player is the host, return the value of what scene they are on
+		    if (client.gameObject.GetComponent<NetworkObject>().IsOwner) value = client.currentScene;
 	    }
-
 	    return value;
     }
     
-    private void ClientConnectToScene(string startingScene)
+    private void ClientConnectToScene(string serverScene)
     {
-	    sceneManager.LoadScene(startingScene, 0.2f);
+	    sceneManager.LoadScene(serverScene, 0.2f);
     }
 
     //=-----------------=
     // External Functions
     //=-----------------=
+    // Called in the title scene by Network_Connection_Manager's OnConnected function
     public void ConnectToScene()
     {
-	    if (networkManager.IsHost)
-	    {
-		    HostConnectToScene(hostStartingScene);
-	    }
-	    else if (networkManager.IsClient)
-	    {
-		    ClientConnectToScene(GetCurrentServerScene());
-	    }
+	    // If the connecting player is the host, connect to the specified starting scene
+	    if (networkManager.IsHost) HostConnectToScene(hostStartingScene);
+	    // If the connecting player is a client, connect to the scene the host is currently on
+	    else if (networkManager.IsClient) ClientConnectToScene(GetCurrentServerScene());
     }
 }
 
