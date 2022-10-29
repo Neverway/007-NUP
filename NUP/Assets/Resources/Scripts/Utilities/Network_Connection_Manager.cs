@@ -85,16 +85,7 @@ public class Network_Connection_Manager : MonoBehaviour
 	    if (!sceneManager) sceneManager = FindObjectOfType<System_SceneManager>();
 	    
 	    UpdateTargetAddress();
-
-	    // Client connection check
-	    if (attemptingConnection && networkManager.IsConnectedClient)
-	    {
-		    // Set this to false so the connectionTimeout function will stop
-		    // Stop attempting to connect
-		    attemptingConnection = false;
-		    // Fire on connected for client (User sets if this sends them to a game, or shows a lobby, etc.)
-		    OnConnected.Invoke();
-	    }
+	    ClientJoiningConnectionCheck();
     }
     
 
@@ -123,6 +114,18 @@ public class Network_Connection_Manager : MonoBehaviour
 	    ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var parsedPort);
 	    // Assign value to transport
 	    transport.ConnectionData.Port = parsedPort;
+    }
+    
+    private void ClientJoiningConnectionCheck()
+    {
+	    // Client connection check
+	    if (!attemptingConnection || !networkManager.IsConnectedClient) return;
+	    
+	    // Set this to false so the connectionTimeout function will stop
+	    // Stop attempting to connect
+	    attemptingConnection = false;
+	    // Fire on connected for client (User sets if this sends them to a game, or shows a lobby, etc.)
+	    OnConnected.Invoke();
     }
     
     
