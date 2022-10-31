@@ -22,8 +22,10 @@ public class Network_Client_Lister : MonoBehaviour
     //=-----------------=
     // Private Variables
     //=-----------------=
-    private List<GameObject> entries;
-    private List<Network_Client> networkClients;
+    [Tooltip("READ-ONLY needs to be public or errors are thrown when trying to clear list")]
+    public List<GameObject> entries;
+    [Tooltip("READ-ONLY needs to be public or errors are thrown when trying to clear list")]
+    public List<Network_Client> networkClients;
 
 
     //=-----------------=

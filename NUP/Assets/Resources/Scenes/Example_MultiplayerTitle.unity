@@ -1814,8 +1814,8 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 730317365}
-        m_TargetAssemblyTypeName: Network_Connection_Manager, Assembly-CSharp
+      - m_Target: {fileID: 730317368}
+        m_TargetAssemblyTypeName: Network_Connection_SetNetTarget, Assembly-CSharp
         m_MethodName: NetworkSetAddress
         m_Mode: 1
         m_Arguments:
@@ -4127,6 +4127,7 @@ GameObject:
   - component: {fileID: 730317366}
   - component: {fileID: 730317364}
   - component: {fileID: 730317367}
+  - component: {fileID: 730317368}
   m_Layer: 0
   m_Name: Local System Manager
   m_TagString: Untagged
@@ -4161,7 +4162,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7371079243b52facb6bf9fdfa7c7092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localClientUsername: 
   usernameField: {fileID: 239532193}
 --- !u!114 &730317365
 MonoBehaviour:
@@ -4176,8 +4176,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   titleScene: Example_MultiplayerTitle
-  addressField: {fileID: 240383955}
-  portField: {fileID: 775963575}
   OnConnecting:
     m_PersistentCalls:
       m_Calls:
@@ -4352,6 +4350,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hostStartingScene: Example_MultiplayerLobby
+--- !u!114 &730317368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730317362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c16f29a35ac8751728e4630dcc09634e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  addressField: {fileID: 240383955}
+  portField: {fileID: 775963575}
 --- !u!1 &758766363
 GameObject:
   m_ObjectHideFlags: 0
@@ -4626,8 +4638,8 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 730317365}
-        m_TargetAssemblyTypeName: Network_Connection_Manager, Assembly-CSharp
+      - m_Target: {fileID: 730317368}
+        m_TargetAssemblyTypeName: Network_Connection_SetNetTarget, Assembly-CSharp
         m_MethodName: NetworkSetPort
         m_Mode: 1
         m_Arguments:
@@ -11846,8 +11858,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clientEntryPrefab: {fileID: 5588828249183525977, guid: aaf512a3ef9480f72b93efb100f7e083, type: 3}
   clientEntryParent: {fileID: 2240530855962694602}
-  entries: []
-  networkClients: []
 --- !u!224 &2240530855783922252
 RectTransform:
   m_ObjectHideFlags: 0
