@@ -1,9 +1,11 @@
-//========== Neverway 2022 Project Script | Written by Unknown Dev ============
+//======== Neverway 2022 Project Script | Written by Arthur Aka Liz ===========
 // 
 // Purpose: 
+//			Store network player data like their username & what level they're on
 // Applied to: 
-// Editor script: 
+//			The root of the network instantiated client entry prefab
 // Notes: 
+//			
 //
 //=============================================================================
 

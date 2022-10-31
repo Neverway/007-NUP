@@ -1,28 +1,28 @@
-//========== Neverway 2022 Project Script | Written by Unknown Dev ============
+//======== Neverway 2022 Project Script | Written by Arthur Aka Liz ===========
 // 
 // Purpose: 
+//			Set the player's network username via a TMP_InputField
 // Applied to: 
-// Editor script: 
+//			The local system manager on the network title scene
 // Notes: 
+//			
 //
 //=============================================================================
 
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class Network_Client_Manager : MonoBehaviour
+public class Network_Client_SetLocalUsername : MonoBehaviour
 {
     //=-----------------=
     // Public Variables
     //=-----------------=
-    public string localClientUsername;
     
 
     //=-----------------=
     // Private Variables
     //=-----------------=
+    private string localClientUsername;
     
     
     //=-----------------=
@@ -34,10 +34,6 @@ public class Network_Client_Manager : MonoBehaviour
     //=-----------------=
     // Mono Functions
     //=-----------------=
-    private void Start()
-    {
-	
-    }
 
     private void Update()
     {
@@ -49,7 +45,7 @@ public class Network_Client_Manager : MonoBehaviour
     //=-----------------=
     private void UpdateLocalClientUsername()
     {
-	    // Exit function if we can't change the address
+	    // Exit function if we can't change the username
 	    // (null address field is quick way for me to check that it can't be changed)
 	    if (!usernameField) return;
 	    
@@ -59,9 +55,7 @@ public class Network_Client_Manager : MonoBehaviour
 	    // Set local vars to NetTarget prefs (makes code look neater)
 	    localClientUsername = PlayerPrefs.GetString("NetClientUsername");
 	    
-	    // Assign username to local client
-	    
-	    // Set input fields to show current address
+	    // Set input field to show current name
 	    usernameField.transform.GetChild(0).GetComponent<TMP_Text>().text = localClientUsername;
     }
     

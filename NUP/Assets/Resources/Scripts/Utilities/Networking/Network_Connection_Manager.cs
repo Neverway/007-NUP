@@ -1,26 +1,19 @@
 //======== Neverway 2022 Project Script | Written by Arthur Aka Liz ===========
 // 
 // Purpose: 
-//			Start connections for server as either Server, Host, or Client, 
-//			 and allow the target address and port to be modified
+//			Start connections for server as either Server, Host, or Client
 // Applied to: 
 //			The local system manager
 // Notes:
-//			UnityTransport, the component script that handles connections 
-//			 (among other things), uses a data efficient variable type called 
-//			 ushort. TryParse is used to turn our string of numbers into a
-//           typeOf ushort
+//			Line 84 doesn't seem like it's handled correctly, though the 
+//			 OnConnected() function still seems to be firing
 //=============================================================================
 
-using System;
 using System.Collections;
 using System.Net;
-using TMPro;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class Network_Connection_Manager : MonoBehaviour
@@ -28,8 +21,6 @@ public class Network_Connection_Manager : MonoBehaviour
     //=-----------------=
     // Public Variables
     //=-----------------=
-    //public string targetAddress;
-    //public string targetPort;
 
 
     //=-----------------=
@@ -41,17 +32,11 @@ public class Network_Connection_Manager : MonoBehaviour
     //=-----------------=
     // Reference Variables
     //=-----------------=
-    private UnityTransport transport;
     private NetworkManager networkManager;
     private System_SceneManager sceneManager;
+    private Network_Connection_InterruptHandler interruptHandler;
 
     [SerializeField] private string titleScene = "0";
-    
-    [Header("Title References")]
-    [Tooltip("The input field where the user types their hosting or connecting ip address")]
-    [SerializeField] private TMP_InputField addressField;
-    [Tooltip("The input field where the user types their hosting or connecting ip port")]
-    [SerializeField] private TMP_InputField portField;
 
     [SerializeField] private UnityEvent OnConnecting;
     [SerializeField] private UnityEvent OnConnectionFailed;
@@ -72,6 +57,7 @@ public class Network_Connection_Manager : MonoBehaviour
 	    if (!attemptingConnection) yield break;
 	    // Stop attempting to connect
 	    attemptingConnection = false;
+	    print("timeout");
 	    // Shutdown the connection attempt
 	    NetworkDisconnect();
 	    // Fire on connection failed
@@ -80,11 +66,10 @@ public class Network_Connection_Manager : MonoBehaviour
     
     private void Update()
     {
-	    if (!transport) transport = FindObjectOfType<UnityTransport>();
 	    if (!networkManager) networkManager = FindObjectOfType<NetworkManager>();
 	    if (!sceneManager) sceneManager = FindObjectOfType<System_SceneManager>();
+	    if (!interruptHandler) interruptHandler = FindObjectOfType<Network_Connection_InterruptHandler>();
 	    
-	    UpdateTargetAddress();
 	    ClientJoiningConnectionCheck();
     }
     
@@ -92,39 +77,19 @@ public class Network_Connection_Manager : MonoBehaviour
     //=-----------------=
     // Internal Functions
     //=-----------------=
-    private void UpdateTargetAddress()
-    {
-	    // If the player prefs for target address and port are not created, create them with the following default values
-	    if (!PlayerPrefs.HasKey("NetTargetAddress")) PlayerPrefs.SetString("NetTargetAddress", "127.0.0.1");
-	    if (!PlayerPrefs.HasKey("NetTargetPort")) PlayerPrefs.SetString("NetTargetPort", "25565");
-	    
-	    // Exit function if we can't change the address
-	    // (null address/port field is quick way for me to check that it can't be changed)
-	    if (!addressField) return;
-	    // Updated placeholder text for address field
-	    addressField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetAddress");
-	    // Assign value to transport
-	    transport.ConnectionData.Address = PlayerPrefs.GetString("NetTargetAddress");
-	    
-	    if (!portField) return;
-	    // Updated placeholder text for port field
-	    portField.transform.GetChild(0).GetComponent<TMP_Text>().text = PlayerPrefs.GetString("NetTargetPort");
-	    // Parse value for transport (transport.connectionData.Port expects a ushort instead of the raw string)
-	    // It's kind of redundant to parse it again here since the player pref value should be valid, but whatever
-	    ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var parsedPort);
-	    // Assign value to transport
-	    transport.ConnectionData.Port = parsedPort;
-    }
     
     private void ClientJoiningConnectionCheck()
     {
 	    // Client connection check
 	    if (!attemptingConnection || !networkManager.IsConnectedClient) return;
 	    
+	    // Set that we should be connected to the server (used to check for connection interrupts)
+	    interruptHandler.hasConnectedToServer = true;
 	    // Set this to false so the connectionTimeout function will stop
 	    // Stop attempting to connect
 	    attemptingConnection = false;
 	    // Fire on connected for client (User sets if this sends them to a game, or shows a lobby, etc.)
+	    print("Why doesn't this print function fire? On connected still seems to be called.");
 	    OnConnected.Invoke();
     }
     
@@ -148,7 +113,11 @@ public class Network_Connection_Manager : MonoBehaviour
 	    // Start host if the address and port is valid
 	    // Ports share the same limits as a ushort, so parsing the target port as ushort will return only valid ports
 	    if (IPAddress.TryParse(PlayerPrefs.GetString("NetTargetAddress"), out var address) && ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var port))
-		    networkManager.StartHost();
+	    {
+		    // Set that we should be connected to the server (used to check for connection interrupts)
+		    interruptHandler.hasConnectedToServer = true;
+			networkManager.StartHost();
+	    }
 	    // Show error message if address is not valid
 	    else OnInvalidAddress.Invoke();
 	    // Fire on connected for client (User sets if this sends them to a game, or shows a lobby, etc.)
@@ -181,40 +150,15 @@ public class Network_Connection_Manager : MonoBehaviour
     {
 	    // Stop the connection check (in case it was running)
 	    attemptingConnection = false;
+	    // Set that we should not be connected to the server (used to check for connection interrupts)
+	    print("SHUTDOWN CALLED");
+	    interruptHandler.hasConnectedToServer = false;
 	    // Disconnect the server
 	    networkManager.Shutdown();
 	    // Load the title scene if it's not already loaded
 	    if (SceneManager.GetActiveScene() != SceneManager.GetSceneByName(titleScene))
 		    sceneManager.LoadScene(titleScene, 0);
     }
-    
-    //=-----------------=
-    // NET TARGET ADDRESS
-    //=-----------------=
-    [Tooltip("Set the target network address from TextMeshPro inputField")]
-    public void NetworkSetAddress()
-    {
-	    // Check the value set in the input field
-	    IPAddress.TryParse(addressField.text, out var parsedAddress);
-	    // If the value is invalid, set it to a default value
-	    if (parsedAddress == null) PlayerPrefs.SetString("NetTargetAddress", "127.0.0.1");
-	    // Assign the value to the network transport
-	    else PlayerPrefs.SetString("NetTargetAddress", parsedAddress.ToString());
-	    // Clear field
-	    addressField.text = "";
-    }
-    [Tooltip("Set the target network port from TextMeshPro inputField")]
-    public void NetworkSetPort()
-    {
-	    // Check the value set in the input field
-	    ushort.TryParse(portField.text, out var parsedPort);
-	    // If the value is invalid, set it to a default value
-	    if (parsedPort == 0) PlayerPrefs.SetString("NetTargetPort", "25565");
-	    // Assign the value to the network transport
-	    else PlayerPrefs.SetString("NetTargetPort", parsedPort.ToString());
-	    // Clear field
-	    portField.text = "";
-	}
 
 	//=-----------------=
 	// SHORT CUTS

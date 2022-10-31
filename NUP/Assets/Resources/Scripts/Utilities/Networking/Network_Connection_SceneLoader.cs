@@ -1,25 +1,23 @@
 //======== Neverway 2022 Project Script | Written by Arthur Aka Liz ===========
 // 
 // Purpose: 
-//			Load a multiplayer lobby, or connect a client to the server's
-//			current scene
+//			Load the appropriate starting scene when connecting to a server
 // Applied to: 
-//			The local system manager on the title scene
+//			The local system manager on the network title scene
 // Notes: 
+//			
 //
 //=============================================================================
 
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class Network_Connection_Connector : MonoBehaviour
+public class Network_Connection_SceneLoader : MonoBehaviour
 {
     //=-----------------=
     // Public Variables
     //=-----------------=
+    [Tooltip ("The string ID of the scene that the server should load when starting a new server")]
     public string hostStartingScene;
 
 
@@ -40,6 +38,7 @@ public class Network_Connection_Connector : MonoBehaviour
     //=-----------------=
     private void Start()
     {
+	    // Find reference objects
 	    sceneManager = FindObjectOfType<System_SceneManager>();
 	    networkManager = FindObjectOfType<NetworkManager>();
     }
@@ -47,26 +46,31 @@ public class Network_Connection_Connector : MonoBehaviour
     //=-----------------=
     // Internal Functions
     //=-----------------=S
+    // Load a specified starting scene
     private void HostConnectToScene(string startingScene)
     {
 	    sceneManager.LoadScene(startingScene, 0.2f);
     }
     
+    // Load the scene that the server is currently on
+    private void ClientConnectToScene(string serverScene)
+    {
+	    sceneManager.LoadScene(serverScene, 0.2f);
+    }
+    
+    // Get which scene the server is currently on
     private string GetCurrentServerScene()
     {
+	    // Set the default return value to the first scene in the build list
 	    var value = "0";
 	    // Look through all players on the server
 	    foreach (var client in FindObjectsOfType<Network_Client>())
 	    {
-		    // If the player is the host, return the value of what scene they are on
+		    // If the player is the host, set the return value to what scene they are on
 		    if (client.gameObject.GetComponent<NetworkObject>().IsOwner) value = client.currentScene;
 	    }
+	    // Return the set value
 	    return value;
-    }
-    
-    private void ClientConnectToScene(string serverScene)
-    {
-	    sceneManager.LoadScene(serverScene, 0.2f);
     }
 
     //=-----------------=

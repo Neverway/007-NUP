@@ -1,14 +1,13 @@
-//========== Neverway 2022 Project Script | Written by Unknown Dev ============
+//======== Neverway 2022 Project Script | Written by Arthur Aka Liz ===========
 // 
 // Purpose: 
+//			Show pop-ups for connecting to a server
 // Applied to: 
-// Editor script: 
+//			The local system manager on the network title scene
 // Notes: 
 //
 //=============================================================================
 
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -30,7 +29,6 @@ public class Network_Connection_Messages : MonoBehaviour
     //=-----------------=
     // Reference Variables
     //=-----------------=
-    private Network_Connection_Manager connectionManager;
     [SerializeField] private GameObject connectionMessageMenu;
     [SerializeField] private GameObject dedicatedServerMenu;
     [SerializeField] private TMP_Text connectionMessageText;
@@ -38,15 +36,12 @@ public class Network_Connection_Messages : MonoBehaviour
     [SerializeField] private GameObject[] connectingButtons;
     [SerializeField] private GameObject[] connectionFailedButtons;
     [SerializeField] private GameObject[] invalidAddressButtons;
-
+    
 
     //=-----------------=
     // Mono Functions
     //=-----------------=
-    private void Start()
-    {
-	    connectionManager = FindObjectOfType<Network_Connection_Manager>();
-    }
+    
     
     //=-----------------=
     // Internal Functions
