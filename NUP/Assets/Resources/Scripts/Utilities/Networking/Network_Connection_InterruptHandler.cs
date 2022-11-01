@@ -5,7 +5,6 @@
 // Applied to: 
 //			The system manager
 // Notes: 
-//			CURRENTLY IN PROGRESS OF WRITING! DO NOT IMPLEMENT IN RELEASE!
 //
 //=============================================================================
 
@@ -30,6 +29,8 @@ public class Network_Connection_InterruptHandler : MonoBehaviour
     // Reference Variables
     //=-----------------=
     private NetworkManager networkManager;
+    private System_SceneManager sceneManager;
+    private Network_Connection_Manager connectionManager;
 
 
     //=-----------------=
@@ -38,6 +39,8 @@ public class Network_Connection_InterruptHandler : MonoBehaviour
     private void Start()
     {
 	    if (!networkManager) networkManager = FindObjectOfType<NetworkManager>();
+	    if (!sceneManager) sceneManager = FindObjectOfType<System_SceneManager>();
+	    if (!connectionManager) connectionManager = FindObjectOfType<Network_Connection_Manager>();
     }
 
     private void Update()
@@ -50,12 +53,11 @@ public class Network_Connection_InterruptHandler : MonoBehaviour
     //=-----------------=
     private void ConnectionInterruptCheck()
     {
-	    print("HC True:" + hasConnectedToServer);
-	    //print("CL True: " + !networkManager.IsConnectedClient);
-	    // Client connection check
-	    if (!networkManager.IsConnectedClient && hasConnectedToServer)
+	    // If not connected to server & should be connected to server & no clients are found
+	    if (!networkManager.IsConnectedClient && hasConnectedToServer && FindObjectsOfType<Network_Client>().Length == 0)
 	    {
-		    if (FindObjectsOfType<Network_Client>().Length == 0) print("TIME TO LEAVE!");
+		    // Properly close the connection (also sends user back to the title scene)
+		    connectionManager.NetworkDisconnect();
 	    }
     }
     

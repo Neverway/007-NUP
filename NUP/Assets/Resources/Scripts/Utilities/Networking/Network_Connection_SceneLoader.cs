@@ -56,13 +56,13 @@ public class Network_Connection_SceneLoader : MonoBehaviour
     // Load a specified starting scene
     private void HostConnectToScene(string startingScene)
     {
-	    sceneManager.LoadScene(startingScene, 0.2f);
+	    sceneManager.LoadScene(startingScene, 0f);
     }
     
     // Load the scene that the server is currently on
     private void ClientConnectToScene(string serverScene)
     {
-	    sceneManager.LoadScene(serverScene, 0.2f);
+	    sceneManager.LoadScene(serverScene, 0f);
     }
     
     // Get which scene the server is currently on

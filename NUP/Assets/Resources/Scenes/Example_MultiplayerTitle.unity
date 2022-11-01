@@ -8316,6 +8316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hasConnectedToServer: 0
+  titleScene: Example_MultiplayerTitle
 --- !u!1 &1416321149
 GameObject:
   m_ObjectHideFlags: 0
