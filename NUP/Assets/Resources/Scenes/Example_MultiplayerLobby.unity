@@ -1294,7 +1294,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7371079243b52facb6bf9fdfa7c7092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localClientUsername: 
   usernameField: {fileID: 0}
 --- !u!114 &730317365
 MonoBehaviour:
@@ -1309,8 +1308,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   titleScene: Example_MultiplayerTitle
-  addressField: {fileID: 0}
-  portField: {fileID: 0}
   OnConnecting:
     m_PersistentCalls:
       m_Calls: []
@@ -2153,7 +2150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -2287,7 +2284,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -3810,10 +3807,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbcd831a4e8a098f8aefe49d1c173df0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clientEntryPrefab: {fileID: 5588828249183525977, guid: aaf512a3ef9480f72b93efb100f7e083, type: 3}
-  clientEntryParent: {fileID: 2240530855962694602}
   entries: []
   networkClients: []
+  clientEntryPrefab: {fileID: 5588828249183525977, guid: aaf512a3ef9480f72b93efb100f7e083, type: 3}
+  clientEntryParent: {fileID: 2240530855962694602}
 --- !u!224 &2240530855783922252
 RectTransform:
   m_ObjectHideFlags: 0

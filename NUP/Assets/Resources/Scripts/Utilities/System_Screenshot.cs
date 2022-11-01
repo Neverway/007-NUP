@@ -21,6 +21,7 @@ public class System_Screenshot : MonoBehaviour
     // Public Variables
     //=-----------------=
     [SerializeField] private KeyCode screenshotKey;
+    [SerializeField] private string projectID;
 
 
     //=-----------------=
@@ -55,7 +56,7 @@ public class System_Screenshot : MonoBehaviour
 	    var screenshotDirectory = Directory.CreateDirectory(screenshotPath);
 	    print(screenshotPath);
 	    var timeNow = DateTime.Now.ToString("dd-MMMM-yyyy HHmmss");
-	    ScreenCapture.CaptureScreenshot(Path.Combine(screenshotDirectory.FullName, "DA-"+timeNow+".png"));
+	    ScreenCapture.CaptureScreenshot(Path.Combine(screenshotDirectory.FullName, "projectID"+"-"+timeNow+".png"));
     }
     
     
