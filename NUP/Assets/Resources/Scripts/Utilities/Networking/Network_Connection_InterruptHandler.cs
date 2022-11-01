@@ -51,7 +51,7 @@ public class Network_Connection_InterruptHandler : MonoBehaviour
     private void ConnectionInterruptCheck()
     {
 	    print("HC True:" + hasConnectedToServer);
-	    print("CL True: " + !networkManager.IsConnectedClient);
+	    //print("CL True: " + !networkManager.IsConnectedClient);
 	    // Client connection check
 	    if (!networkManager.IsConnectedClient && hasConnectedToServer)
 	    {

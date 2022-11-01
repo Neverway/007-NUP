@@ -51,8 +51,10 @@ public class Network_Connection_Manager : MonoBehaviour
     // Client connection timed out
     private IEnumerator ConnectionTimeout()
     {
+	    print("AtmptCnnc1: " + attemptingConnection);
 	    // Start a five second countdown
 	    yield return new WaitForSeconds(5);
+	    print("AtmptCnnc2: " + attemptingConnection);
 	    // If connection to server has been established, exit function
 	    if (!attemptingConnection) yield break;
 	    // Stop attempting to connect
@@ -82,8 +84,8 @@ public class Network_Connection_Manager : MonoBehaviour
     {
 	    // Client connection check
 	    if (!attemptingConnection || !networkManager.IsConnectedClient) return;
-	    
 	    // Set that we should be connected to the server (used to check for connection interrupts)
+	    print("Set true client joining");
 	    interruptHandler.hasConnectedToServer = true;
 	    // Set this to false so the connectionTimeout function will stop
 	    // Stop attempting to connect
@@ -115,6 +117,7 @@ public class Network_Connection_Manager : MonoBehaviour
 	    if (IPAddress.TryParse(PlayerPrefs.GetString("NetTargetAddress"), out var address) && ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var port))
 	    {
 		    // Set that we should be connected to the server (used to check for connection interrupts)
+		    print("Set true host joining");
 		    interruptHandler.hasConnectedToServer = true;
 			networkManager.StartHost();
 	    }
@@ -131,7 +134,7 @@ public class Network_Connection_Manager : MonoBehaviour
 	    if (IPAddress.TryParse(PlayerPrefs.GetString("NetTargetAddress"), out var address) && ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var port))
 	    {
 		    networkManager.StartClient();
-		    // Fire on connecting
+		    // Fire on connecting (show the 'connecting...' message)
 		    OnConnecting.Invoke();
 		    // Start connection timeout timer
 		    StartCoroutine(ConnectionTimeout());

@@ -8283,7 +8283,7 @@ MonoBehaviour:
     EnableTimeResync: 0
     TimeResyncInterval: 30
     EnsureNetworkVariableLengthSafety: 0
-    EnableSceneManagement: 1
+    EnableSceneManagement: 0
     ForceSamePrefabs: 1
     RecycleNetworkIds: 1
     NetworkIdRecycleDelay: 120
@@ -11856,6 +11856,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbcd831a4e8a098f8aefe49d1c173df0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entries: []
+  networkClients: []
   clientEntryPrefab: {fileID: 5588828249183525977, guid: aaf512a3ef9480f72b93efb100f7e083, type: 3}
   clientEntryParent: {fileID: 2240530855962694602}
 --- !u!224 &2240530855783922252

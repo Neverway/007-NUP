@@ -9,6 +9,7 @@
 //
 //=============================================================================
 
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -42,6 +43,12 @@ public class Network_Connection_SceneLoader : MonoBehaviour
 	    sceneManager = FindObjectOfType<System_SceneManager>();
 	    networkManager = FindObjectOfType<NetworkManager>();
     }
+
+    private IEnumerator WaitForClientInstantiation()
+    {
+	    yield return new WaitForSeconds(0.5f);
+	    ClientConnectToScene(GetCurrentServerScene());
+    }
     
     //=-----------------=
     // Internal Functions
@@ -62,12 +69,12 @@ public class Network_Connection_SceneLoader : MonoBehaviour
     private string GetCurrentServerScene()
     {
 	    // Set the default return value to the first scene in the build list
-	    var value = "0";
+	    var value = hostStartingScene;
 	    // Look through all players on the server
 	    foreach (var client in FindObjectsOfType<Network_Client>())
 	    {
 		    // If the player is the host, set the return value to what scene they are on
-		    if (client.gameObject.GetComponent<NetworkObject>().IsOwner) value = client.currentScene;
+		    if (client.OwnerClientId == NetworkManager.ServerClientId) value = client.currentScene;
 	    }
 	    // Return the set value
 	    return value;
@@ -82,7 +89,7 @@ public class Network_Connection_SceneLoader : MonoBehaviour
 	    // If the connecting player is the host, connect to the specified starting scene
 	    if (networkManager.IsHost) HostConnectToScene(hostStartingScene);
 	    // If the connecting player is a client, connect to the scene the host is currently on
-	    else if (networkManager.IsClient) ClientConnectToScene(GetCurrentServerScene());
+	    else if (networkManager.IsClient) StartCoroutine(WaitForClientInstantiation());
     }
 }
 
