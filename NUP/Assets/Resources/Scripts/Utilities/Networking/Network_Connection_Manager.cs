@@ -51,15 +51,12 @@ public class Network_Connection_Manager : MonoBehaviour
     // Client connection timed out
     private IEnumerator ConnectionTimeout()
     {
-	    print("AtmptCnnc1: " + attemptingConnection);
 	    // Start a five second countdown
 	    yield return new WaitForSeconds(5);
-	    print("AtmptCnnc2: " + attemptingConnection);
 	    // If connection to server has been established, exit function
 	    if (!attemptingConnection) yield break;
 	    // Stop attempting to connect
 	    attemptingConnection = false;
-	    print("timeout");
 	    // Shutdown the connection attempt
 	    NetworkDisconnect();
 	    // Fire on connection failed
@@ -85,13 +82,11 @@ public class Network_Connection_Manager : MonoBehaviour
 	    // Client connection check
 	    if (!attemptingConnection || !networkManager.IsConnectedClient) return;
 	    // Set that we should be connected to the server (used to check for connection interrupts)
-	    print("Set true client joining");
 	    interruptHandler.hasConnectedToServer = true;
 	    // Set this to false so the connectionTimeout function will stop
 	    // Stop attempting to connect
 	    attemptingConnection = false;
 	    // Fire on connected for client (User sets if this sends them to a game, or shows a lobby, etc.)
-	    print("Why doesn't this print function fire? On connected still seems to be called.");
 	    OnConnected.Invoke();
     }
     
@@ -117,7 +112,6 @@ public class Network_Connection_Manager : MonoBehaviour
 	    if (IPAddress.TryParse(PlayerPrefs.GetString("NetTargetAddress"), out var address) && ushort.TryParse(PlayerPrefs.GetString("NetTargetPort"), out var port))
 	    {
 		    // Set that we should be connected to the server (used to check for connection interrupts)
-		    print("Set true host joining");
 		    interruptHandler.hasConnectedToServer = true;
 			networkManager.StartHost();
 	    }
@@ -154,7 +148,6 @@ public class Network_Connection_Manager : MonoBehaviour
 	    // Stop the connection check (in case it was running)
 	    attemptingConnection = false;
 	    // Set that we should not be connected to the server (used to check for connection interrupts)
-	    print("SHUTDOWN CALLED");
 	    interruptHandler.hasConnectedToServer = false;
 	    // Disconnect the server
 	    networkManager.Shutdown();

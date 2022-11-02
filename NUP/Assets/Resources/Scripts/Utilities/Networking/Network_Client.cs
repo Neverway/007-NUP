@@ -45,8 +45,8 @@ public class Network_Client : NetworkBehaviour
     //=-----------------=
     // Reference Variables
     //=-----------------=
-    //[SerializeField] private GameObject playerPrefab;
-    //public GameObject localPlayer;
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private GameObject localPlayer;
 
 
     //=-----------------=
@@ -86,6 +86,29 @@ public class Network_Client : NetworkBehaviour
     // External Functions
     //=-----------------=
     // Spawn the local player on the server side
+    public void InstantiatePlayerServer(ulong requesterID)
+    {
+	    // Create a reference to the instantiated player object
+	    var instantiatedPlayer = Instantiate(playerPrefab);
+	    // Set the player object to destroy on scene change
+	    instantiatedPlayer.GetComponent<NetworkObject>().Spawn();
+	    // Set the instantiated player's owner as the client that sent the request 
+	    instantiatedPlayer.GetComponent<NetworkObject>().ChangeOwnership(requesterID);
+	    // Assign the local player on the server side (Need to find a way to do this on client side as well)
+	    localPlayer = instantiatedPlayer;
+    }
+    [ServerRpc(RequireOwnership = false)]
+    public void InstantiatePlayerServerRpc(ulong requesterID)
+    {
+	    // Create a reference to the instantiated player object
+	    var instantiatedPlayer = Instantiate(playerPrefab);
+	    // Set the player object to destroy on scene change
+	    instantiatedPlayer.GetComponent<NetworkObject>().Spawn();
+	    // Set the instantiated player's owner as the client that sent the request 
+	    instantiatedPlayer.GetComponent<NetworkObject>().ChangeOwnership(requesterID);
+	    // Assign the local player on the server side (Need to find a way to do this on client side as well)
+	    localPlayer = instantiatedPlayer;
+    }
     /* Old code for spawning a player entity, needs to be redone so commenting it out for now while reworking rest of
      script
     [ServerRpc(RequireOwnership = false)]
